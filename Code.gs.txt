@@ -1,0 +1,40 @@
+/** * VINCI PLAY - MASTER BACKEND */
+
+function doGet(e) {
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('Vinci Play | Bonfire 2026')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function getOrganizerData() {
+  const ss = SpreadsheetApp.openById("1BY89W5KZSIoWKoRVByu2yr1nMXF4MvndJsdxyze3eoo"); // Your Sheet ID
+  const sheet = ss.getSheetByName('Organizer');
+  const data = sheet.getRange("A2:B2").getValues()[0];
+  return { name: data[0], photo: data[1] };
+}
+
+function processRegistration(formObject) {
+  const ss = SpreadsheetApp.openById("1BY89W5KZSIoWKoRVByu2yr1nMXF4MvndJsdxyze3eoo");
+  const sheet = ss.getSheetByName('Registrations') || ss.getSheets()[0];
+  
+  sheet.appendRow([
+    new Date(), 
+    formObject.name, 
+    formObject.dept, 
+    formObject.phone, 
+    formObject.email, 
+    formObject.photoData
+  ]);
+  
+  return {status: "Success"};
+}
+
+function parseSheetData() {
+  const ss = SpreadsheetApp.openById("1BY89W5KZSIoWKoRVByu2yr1nMXF4MvndJsdxyze3eoo");
+  const sheet = ss.getSheetByName('Registrations') || ss.getSheets()[0];
+  const data = sheet.getDataRange().getValues();
+  data.shift(); 
+  return data.map(r => ({name: r[1], dept: r[2], photo: r[5]}));
+}
